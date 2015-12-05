@@ -10,8 +10,8 @@
     tools:showIn="@layout/activity_main" tools:context=".MainActivity">
 
     <TextView
-        android:text="@string/fa_align_justify"
-        android:id="@+id/text1"
+        android:text="@string/loremipsum"
+        android:id="@+id/text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 </RelativeLayout>

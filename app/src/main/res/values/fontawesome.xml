@@ -1,4 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="fa_align_justify">&#xf039;</string>
+    <string name="fa_bars">&#xf0c9;</string>
+    <string name="fa_refresh">&#xf021;</string>
+    <string name="fa_file">&#xf15b;</string>
 </resources>

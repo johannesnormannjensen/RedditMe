@@ -11,28 +11,29 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
 
+import com.google.common.io.Resources;
+
 public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+//        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+//        setSupportActionBar(toolbar);
 
-        TextView textView = (TextView) findViewById(R.id.text1);
+//        DrawableAwesome drable = new DrawableAwesome.DrawableAwesomeBuilder(getApplicationContext(), R.string.fa_bars).build();
+//
+//        toolbar.setOverflowIcon(drable);
+
         Typeface font = Typeface.createFromAsset(getAssets(), "fonts/fontawesome-webfont.ttf");
-        textView.setTypeface(font);
-//        textView.setText((R.string.icon_heart));
-
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
+        TextView updateButton = (TextView) findViewById(R.id.update);
+        updateButton.setTypeface(font);
+        TextView newThreadButton = (TextView) findViewById(R.id.newThread);
+        newThreadButton.setTypeface(font);
+        TextView sideBarButton = (TextView) findViewById(R.id.sideBar);
+        sideBarButton.setTypeface(font);
+//        textView.setText((R.string.fa_align_justify));
     }
 
     @Override
