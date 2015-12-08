@@ -1,4 +1,4 @@
-package com.redditme;
+package com.redditme.fontawesome;
 
 import android.content.Context;
 import android.graphics.Canvas;
@@ -110,9 +110,10 @@ public class DrawableAwesome extends Drawable {
         private float shadowDy = 0;
         private int shadowColor = Color.WHITE;
 
-        public DrawableAwesomeBuilder(Context context, int icon) {
+        public DrawableAwesomeBuilder(Context context, int icon, int sizeDpi) {
             this.context = context;
             this.icon = icon;
+            this.sizeDpi = sizeDpi;
         }
 
         public void setSize(int size) {

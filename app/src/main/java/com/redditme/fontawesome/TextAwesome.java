@@ -1,35 +1,32 @@
-package com.redditme;
+package com.redditme.fontawesome;
 
 import android.content.Context;
 import android.graphics.Typeface;
 import android.util.AttributeSet;
 import android.util.LruCache;
-import android.widget.Button;
+import android.widget.TextView;
 
 /**
  * Created by Johannes on 03-12-2015.
  */
-public class ButtonAwesome extends Button {
+public class TextAwesome extends TextView {
 
     private final static String NAME = "FONTAWESOME";
     private static LruCache<String, Typeface> sTypefaceCache = new LruCache<String, Typeface>(12);
 
-
-    public ButtonAwesome(Context context) {
+    public TextAwesome(Context context) {
         super(context);
         init();
 
     }
-    public ButtonAwesome(Context context,AttributeSet attrs) {
-        super(context,attrs);
-        init();
-    }
-    public ButtonAwesome(Context context, AttributeSet attrs, int defStyle){
-        super(context,attrs,defStyle);
+
+    public TextAwesome(Context context, AttributeSet attrs) {
+        super(context, attrs);
         init();
     }
 
-    public void init(){
+    public void init() {
+
         Typeface typeface = sTypefaceCache.get(NAME);
 
         if (typeface == null) {
@@ -40,5 +37,7 @@ public class ButtonAwesome extends Button {
         }
 
         setTypeface(typeface);
+
     }
+
 }
