@@ -19,6 +19,10 @@ import com.redditme.activity.ItemFragment;
 import com.redditme.adapter.PostcardAdapter;
 import com.redditme.fontawesome.DrawableAwesome;
 import com.redditme.model.PostCard;
+import com.redditme.redditservice.AsyncRedditClient;
+import com.redditme.redditservice.RedditService;
+
+import net.dean.jraw.models.Submission;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,10 +36,13 @@ public class MainActivity extends AppCompatActivity implements FragmentSidemenu.
     private RecyclerView content;
     private PostcardAdapter adapter;
 
+    final RedditService redditService = new AsyncRedditClient();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        redditService.authenticateUserless();
         this.postCardList = new ArrayList<PostCard>();
 
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -47,9 +54,7 @@ public class MainActivity extends AppCompatActivity implements FragmentSidemenu.
         sidemenuFragment.setUp(R.id.fragment_navigation_drawer, (DrawerLayout) findViewById(R.id.drawer_layout), mToolbar);
         sidemenuFragment.setDrawerListener(this);
 
-        populatePostCardList(postCardList, 0);
-
-        content = (RecyclerView)findViewById(R.id.rv_postcards);
+        content = (RecyclerView) findViewById(R.id.rv_postcards);
         content.setHasFixedSize(true);
         adapter = new PostcardAdapter(postCardList);
         content.setAdapter(adapter);
@@ -79,7 +84,7 @@ public class MainActivity extends AppCompatActivity implements FragmentSidemenu.
             return true;
         }
 
-        if(id == R.id.action_refresh){
+        if (id == R.id.action_refresh) {
 //            Here we need to refresh the current subreddit
             Toast.makeText(getApplicationContext(), "Refreshing", Toast.LENGTH_SHORT).show();
             return true;
@@ -91,7 +96,6 @@ public class MainActivity extends AppCompatActivity implements FragmentSidemenu.
     @Override
     public void onDrawerItemSelected(View view, int position) {
         displayView(position);
-
     }
 
     private void displayView(int position) {
@@ -115,27 +119,14 @@ public class MainActivity extends AppCompatActivity implements FragmentSidemenu.
     }
 
     private void populatePostCardList(List<PostCard> postCardList, int subreddit) {
-        if(!postCardList.isEmpty()) {
-        postCardList.clear();
+        if (!postCardList.isEmpty()) {
+            postCardList.clear();
         }
-        switch (subreddit) {
-            case 0:
-                postCardList.add(new PostCard("Frontpage Itemheader", "IT'S OVER 9000!!!", 9000, new DrawableAwesome.DrawableAwesomeBuilder(getApplicationContext(), R.string.fa_heart, 60).build()));
-                break;
-            case 1:
-                postCardList.add(new PostCard("Second subreddit itemheader", "test1", 500, new DrawableAwesome.DrawableAwesomeBuilder(getApplicationContext(), R.string.fa_file, 60).build()));
-                break;
-            case 2:
-                postCardList.add(new PostCard("Third subreddit itemheader", "test2", 10, new DrawableAwesome.DrawableAwesomeBuilder(getApplicationContext(), R.string.fa_bars, 60).build()));
-                break;
+        redditService.loadSubmissions();
+        List<Submission> submissions = redditService.getCurrentSubmissions();
+        for (int i = 0; i < submissions.size(); i++) {
+            Submission subm = submissions.get(i);
+            postCardList.add(new PostCard(subm.getTitle(), subm.getSelftext(), subm.getCommentCount(), new DrawableAwesome.DrawableAwesomeBuilder(getApplicationContext(), R.string.fa_file, 60).build()));
         }
-        postCardList.add(new PostCard("test1", "test1", 500, new DrawableAwesome.DrawableAwesomeBuilder(getApplicationContext(), R.string.fa_file, 60).build()));
-        postCardList.add(new PostCard("test1", "test1", 500, new DrawableAwesome.DrawableAwesomeBuilder(getApplicationContext(),R.string.fa_file, 60).build()));
-        postCardList.add(new PostCard("test4", "test4", 9000, new DrawableAwesome.DrawableAwesomeBuilder(getApplicationContext(), R.string.fa_heart, 60).build()));
-        postCardList.add(new PostCard("test2", "test2", 10, new DrawableAwesome.DrawableAwesomeBuilder(getApplicationContext(), R.string.fa_bars, 60).build()));
-        postCardList.add(new PostCard("test3", "test3", 33, new DrawableAwesome.DrawableAwesomeBuilder(getApplicationContext(), R.string.fa_bars, 60).build()));
-        postCardList.add(new PostCard("test4", "test4", 9000, new DrawableAwesome.DrawableAwesomeBuilder(getApplicationContext(), R.string.fa_heart, 60).build()));
-        postCardList.add(new PostCard("test3", "test3", 33, new DrawableAwesome.DrawableAwesomeBuilder(getApplicationContext(), R.string.fa_bars, 60).build()));
-        postCardList.add(new PostCard("test4", "IT'S OVER 9000!!!", 9000, new DrawableAwesome.DrawableAwesomeBuilder(getApplicationContext(), R.string.fa_heart, 60).build()));
     }
 }
