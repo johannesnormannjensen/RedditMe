@@ -1,5 +1,6 @@
 package com.redditme;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -9,11 +10,14 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
 import com.redditme.activity.FragmentSidemenu;
 import com.redditme.activity.ItemFragment;
 import com.redditme.adapter.PostcardAdapter;
@@ -22,7 +26,13 @@ import com.redditme.model.PostCard;
 import com.redditme.redditservice.AsyncRedditClient;
 import com.redditme.redditservice.RedditService;
 
+import net.dean.jraw.RedditClient;
+import net.dean.jraw.http.UserAgent;
+import net.dean.jraw.models.Listing;
 import net.dean.jraw.models.Submission;
+import net.dean.jraw.paginators.Sorting;
+import net.dean.jraw.paginators.SubredditPaginator;
+import net.dean.jraw.paginators.TimePeriod;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,17 +46,16 @@ public class MainActivity extends AppCompatActivity implements FragmentSidemenu.
     private RecyclerView content;
     private PostcardAdapter adapter;
 
+    private static final String TAG = MainActivity.class.getSimpleName();
     final RedditService redditService = new AsyncRedditClient();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        redditService.authenticateUserless();
-        this.postCardList = new ArrayList<PostCard>();
 
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
-
         setSupportActionBar(mToolbar);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
@@ -54,9 +63,13 @@ public class MainActivity extends AppCompatActivity implements FragmentSidemenu.
         sidemenuFragment.setUp(R.id.fragment_navigation_drawer, (DrawerLayout) findViewById(R.id.drawer_layout), mToolbar);
         sidemenuFragment.setDrawerListener(this);
 
+        redditService.authenticateUserless();
+
+
         content = (RecyclerView) findViewById(R.id.rv_postcards);
         content.setHasFixedSize(true);
-        adapter = new PostcardAdapter(postCardList);
+        adapter = new PostcardAdapter(redditService.getCurrentSubmissions(), getApplicationContext());
+
         content.setAdapter(adapter);
         LinearLayoutManager llm = new LinearLayoutManager(getApplicationContext());
         content.setLayoutManager(llm);
@@ -96,6 +109,7 @@ public class MainActivity extends AppCompatActivity implements FragmentSidemenu.
     @Override
     public void onDrawerItemSelected(View view, int position) {
         displayView(position);
+
     }
 
     private void displayView(int position) {
@@ -109,8 +123,7 @@ public class MainActivity extends AppCompatActivity implements FragmentSidemenu.
             fragmentTransaction.replace(R.id.container_body, fragment);
             fragmentTransaction.commit();
 
-//            populate postcardlist
-            populatePostCardList(this.postCardList, position);
+//          oh! we changed our entire collection!
             adapter.notifyDataSetChanged();
 
 //            set the toolbar title
@@ -118,15 +131,16 @@ public class MainActivity extends AppCompatActivity implements FragmentSidemenu.
         }
     }
 
-    private void populatePostCardList(List<PostCard> postCardList, int subreddit) {
-        if (!postCardList.isEmpty()) {
-            postCardList.clear();
-        }
-        redditService.loadSubmissions();
-        List<Submission> submissions = redditService.getCurrentSubmissions();
-        for (int i = 0; i < submissions.size(); i++) {
-            Submission subm = submissions.get(i);
-            postCardList.add(new PostCard(subm.getTitle(), subm.getSelftext(), subm.getCommentCount(), new DrawableAwesome.DrawableAwesomeBuilder(getApplicationContext(), R.string.fa_file, 60).build()));
-        }
+    public void postClick(View view) {
+        TextView vuev = (TextView) view.findViewById(R.id.post_title);
+        Log.d(TAG, vuev.getText().toString());
+        Gson gS = new Gson();
+        PostCard postCard = postCardList.get(0);
+        String target = gS.toJson(postCard);
+        Log.d(TAG, target);
+        Intent intent = new Intent(this, ThreadActivity.class);
+        intent.putExtra("postCard", target);
+        Log.d(TAG, "Starting ThreadActivity...");
+        startActivity(intent);
     }
 }
