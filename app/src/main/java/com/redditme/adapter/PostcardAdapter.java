@@ -3,6 +3,7 @@ package com.redditme.adapter;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.Drawable;
 import android.graphics.drawable.VectorDrawable;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
@@ -13,15 +14,21 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.redditme.MainActivity;
 import com.redditme.R;
+import com.redditme.ThumbnailGenerator;
 import com.redditme.model.PostCard;
 
 import net.dean.jraw.models.Submission;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 /**
  * Created by Johannes on 06-12-2015.
@@ -29,12 +36,9 @@ import java.util.List;
 public class PostcardAdapter extends RecyclerView.Adapter<PostcardAdapter.SubmissionViewHolder> {
 
     private List<Submission> submissionList;
-    private Context context;
-    private final Bitmap defaultRedditThumbnail = BitmapFactory.decodeResource(context.getResources(), R.drawable.reddit_standard);
 
-    public PostcardAdapter(List<Submission> submissionList, Context context) {
+    public PostcardAdapter(List<Submission> submissionList) {
         this.submissionList = submissionList;
-        this.context = context;
     }
 
     @Override
@@ -51,23 +55,27 @@ public class PostcardAdapter extends RecyclerView.Adapter<PostcardAdapter.Submis
 
     @Override
     public void onBindViewHolder(SubmissionViewHolder postCardViewHolder, int position) {
+        Context context = MainActivity.getMainContext();
         postCardViewHolder.postTitle.setText(submissionList.get(position).getTitle());
         postCardViewHolder.postDescription.setText(submissionList.get(position).getSelftext());
         String sThumbnailURL = submissionList.get(position).getThumbnail();
-        Bitmap thumbnail = null;
+        Drawable thumbnail;
+        if(sThumbnailURL == null) {
+            thumbnail = context.getResources().getDrawable(R.drawable.reddit_standard);
+        } else {
+            ThumbnailGenerator tng = new ThumbnailGenerator();
             try {
-                if(sThumbnailURL.isEmpty()) {
-                    thumbnail = defaultRedditThumbnail;
-                } else {
-                    URL thumbnailURL = new URL(sThumbnailURL);
-                    thumbnail = BitmapFactory.decodeStream(thumbnailURL.openConnection().getInputStream());
-                }
-            } catch (MalformedURLException e) {
+                tng.execute(sThumbnailURL).get(10, TimeUnit.SECONDS);
+            } catch (InterruptedException e) {
                 e.printStackTrace();
-            } catch (IOException e) {
+            } catch (ExecutionException e) {
+                e.printStackTrace();
+            } catch (TimeoutException e) {
                 e.printStackTrace();
             }
-        postCardViewHolder.postThumbnail.setImageBitmap(thumbnail);
+            thumbnail = tng.gimmeTheThumbnail();
+        }
+        postCardViewHolder.postThumbnail.setImageDrawable(thumbnail);
     }
 
     @Override

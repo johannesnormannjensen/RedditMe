@@ -17,6 +17,8 @@ import com.redditme.adapter.PostcardAdapter;
 import com.redditme.fontawesome.DrawableAwesome;
 import com.redditme.model.PostCard;
 
+import net.dean.jraw.models.Submission;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,7 +30,7 @@ public class ThreadActivity extends AppCompatActivity {
     private static final String TAG = MainActivity.class.getSimpleName();
 
     private Toolbar mToolbar;
-    List<PostCard> postCardList;
+    private Submission submission;
     private RecyclerView content;
     private PostcardAdapter adapter;
 
@@ -36,13 +38,11 @@ public class ThreadActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        this.postCardList = new ArrayList<PostCard>();
 
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
-        String gsonPostCard = getIntent().getStringExtra("postCard");
+        String gsonSubmission = getIntent().getStringExtra("theSubmission");
         Gson gS = new Gson();
-        PostCard postCardObj = gS.fromJson(gsonPostCard, PostCard.class);
-        populatePostCardList(postCardObj);
+        this.submission = gS.fromJson(gsonSubmission, Submission.class);
         setSupportActionBar(mToolbar);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
@@ -82,7 +82,7 @@ public class ThreadActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private void populatePostCardList(PostCard postcard) {
-        this.postCardList.add(postcard);
+    private void setSubmission(Submission submission) {
+        this.submission= submission;
     }
 }

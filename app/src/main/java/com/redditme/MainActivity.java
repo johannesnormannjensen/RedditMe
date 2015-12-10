@@ -1,5 +1,6 @@
 package com.redditme;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -40,13 +41,15 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements FragmentSidemenu.FragmentDrawerListener {
 
+    private static final String TAG = MainActivity.class.getSimpleName();
+
+    private static Context mainContext = null;
+
     private Toolbar mToolbar;
     private FragmentSidemenu sidemenuFragment;
-    private List<PostCard> postCardList;
     private RecyclerView content;
     private PostcardAdapter adapter;
 
-    private static final String TAG = MainActivity.class.getSimpleName();
     final RedditService redditService = new AsyncRedditClient();
 
 
@@ -54,7 +57,6 @@ public class MainActivity extends AppCompatActivity implements FragmentSidemenu.
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(mToolbar);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
@@ -63,15 +65,20 @@ public class MainActivity extends AppCompatActivity implements FragmentSidemenu.
         sidemenuFragment.setUp(R.id.fragment_navigation_drawer, (DrawerLayout) findViewById(R.id.drawer_layout), mToolbar);
         sidemenuFragment.setDrawerListener(this);
 
-        redditService.authenticateUserless();
+        mainContext = this.getApplicationContext();
 
+        redditService.authenticateUserless();
+        if(!redditService.getRedditClient().isAuthenticated()) {
+            Toast.makeText(mainContext, "User not authenticated", Toast.LENGTH_SHORT).show();
+        }
+        redditService.loadSubmissions();
 
         content = (RecyclerView) findViewById(R.id.rv_postcards);
         content.setHasFixedSize(true);
-        adapter = new PostcardAdapter(redditService.getCurrentSubmissions(), getApplicationContext());
+        adapter = new PostcardAdapter(redditService.getCurrentSubmissions());
 
         content.setAdapter(adapter);
-        LinearLayoutManager llm = new LinearLayoutManager(getApplicationContext());
+        LinearLayoutManager llm = new LinearLayoutManager(mainContext);
         content.setLayoutManager(llm);
 
         // display the first navigation drawer view on app launch
@@ -135,12 +142,16 @@ public class MainActivity extends AppCompatActivity implements FragmentSidemenu.
         TextView vuev = (TextView) view.findViewById(R.id.post_title);
         Log.d(TAG, vuev.getText().toString());
         Gson gS = new Gson();
-        PostCard postCard = postCardList.get(0);
-        String target = gS.toJson(postCard);
+        Submission submission = redditService.getCurrentSubmissions().get(0);
+        String target = gS.toJson(submission);
         Log.d(TAG, target);
         Intent intent = new Intent(this, ThreadActivity.class);
-        intent.putExtra("postCard", target);
+        intent.putExtra("theSubmission", target);
         Log.d(TAG, "Starting ThreadActivity...");
         startActivity(intent);
+    }
+
+    public static Context getMainContext() {
+        return mainContext;
     }
 }

@@ -34,19 +34,27 @@ public class AsyncRedditClient extends RedditClient implements RedditService {
 
     @Override
     public void authenticateUserless() throws NetworkException {
-        new AsyncTask<RedditClient, Void, OAuthData>() {
-            @Override
-            protected OAuthData doInBackground(RedditClient... params) {
-                OAuthData authData = null;
-                try {
-                    authData = getOAuthHelper().easyAuth(USERLESS);
-                } catch (OAuthException e) {
-                    e.printStackTrace();
+        try {
+            new AsyncTask<RedditClient, Void, OAuthData>() {
+                @Override
+                protected OAuthData doInBackground(RedditClient... params) {
+                    OAuthData authData = null;
+                    try {
+                        authData = getOAuthHelper().easyAuth(USERLESS);
+                    } catch (OAuthException e) {
+                        e.printStackTrace();
+                    }
+                    authenticate(authData);
+                    return authData;
                 }
-                authenticate(authData);
-                return authData;
-            }
-        }.execute(this);
+            }.execute(this).get(10, TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        } catch (TimeoutException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -61,7 +69,7 @@ public class AsyncRedditClient extends RedditClient implements RedditService {
                     setCurrentSubmissions(submissions);
                     return submissions;
                 }
-            }.execute(this).get(10000, TimeUnit.MILLISECONDS);
+            }.execute(this).get(10000, TimeUnit.MILLISECONDS); // if the asynctask doesn't complete within 10000 ms the main thread continues.
         } catch (InterruptedException e) {
             e.printStackTrace();
         } catch (ExecutionException e) {
