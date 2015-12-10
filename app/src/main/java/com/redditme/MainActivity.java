@@ -39,44 +39,41 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class MainActivity extends AppCompatActivity implements FragmentSidemenu.FragmentDrawerListener {
+public class MainActivity extends AppCompatActivity
+        implements FragmentSidemenu.FragmentDrawerListener {
 
     private static final String TAG = MainActivity.class.getSimpleName();
 
     private static Context mainContext = null;
+    final RedditService redditService = new AsyncRedditClient();
 
     private Toolbar mToolbar;
     private FragmentSidemenu sidemenuFragment;
     private RecyclerView content;
     private PostcardAdapter adapter;
 
-    final RedditService redditService = new AsyncRedditClient();
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        mainContext = this.getApplicationContext();
+
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(mToolbar);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
-        sidemenuFragment = (FragmentSidemenu) getSupportFragmentManager().findFragmentById(R.id.fragment_navigation_drawer);
-        sidemenuFragment.setUp(R.id.fragment_navigation_drawer, (DrawerLayout) findViewById(R.id.drawer_layout), mToolbar);
+        sidemenuFragment = (FragmentSidemenu) getSupportFragmentManager()
+                .findFragmentById(R.id.fragment_navigation_drawer);
+        sidemenuFragment.setUp(R.id.fragment_navigation_drawer,
+                (DrawerLayout) findViewById(R.id.drawer_layout), mToolbar);
         sidemenuFragment.setDrawerListener(this);
 
-        mainContext = this.getApplicationContext();
-
         redditService.authenticateUserless();
-        if(!redditService.getRedditClient().isAuthenticated()) {
-            Toast.makeText(mainContext, "User not authenticated", Toast.LENGTH_SHORT).show();
-        }
         redditService.loadSubmissions();
 
         content = (RecyclerView) findViewById(R.id.rv_postcards);
         content.setHasFixedSize(true);
         adapter = new PostcardAdapter(redditService.getCurrentSubmissions());
-
         content.setAdapter(adapter);
         LinearLayoutManager llm = new LinearLayoutManager(mainContext);
         content.setLayoutManager(llm);

@@ -76,6 +76,7 @@ public class PostcardAdapter extends RecyclerView.Adapter<PostcardAdapter.Submis
             thumbnail = tng.gimmeTheThumbnail();
         }
         postCardViewHolder.postThumbnail.setImageDrawable(thumbnail);
+        postCardViewHolder.postCommentsCount.setText(submissionList.get(position).getCommentCount().toString());
     }
 
     @Override
@@ -88,6 +89,7 @@ public class PostcardAdapter extends RecyclerView.Adapter<PostcardAdapter.Submis
         TextView postTitle;
         TextView postDescription;
         ImageView postThumbnail;
+        TextView postCommentsCount;
 
         SubmissionViewHolder(View itemView) {
             super(itemView);
@@ -95,6 +97,7 @@ public class PostcardAdapter extends RecyclerView.Adapter<PostcardAdapter.Submis
             postTitle = (TextView)itemView.findViewById(R.id.post_title);
             postDescription = (TextView)itemView.findViewById(R.id.post_description);
             postThumbnail = (ImageView)itemView.findViewById(R.id.post_thumbnail);
+            postCommentsCount = (TextView)itemView.findViewById(R.id.post_commentsCount);
         }
     }
 }
