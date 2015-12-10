@@ -27,4 +27,6 @@ public interface RedditService {
     public void setCurrentSubmissions(List<Submission> submissions);
 
     public List<Submission> getCurrentSubmissions();
+
+    public Submission getSubmissionById(String id);
 }

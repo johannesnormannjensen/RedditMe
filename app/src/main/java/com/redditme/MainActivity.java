@@ -18,6 +18,10 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.google.gson.Gson;
 import com.redditme.activity.FragmentSidemenu;
 import com.redditme.activity.ItemFragment;
@@ -31,6 +35,7 @@ import net.dean.jraw.RedditClient;
 import net.dean.jraw.http.UserAgent;
 import net.dean.jraw.models.Listing;
 import net.dean.jraw.models.Submission;
+import net.dean.jraw.models.meta.SubmissionSerializer;
 import net.dean.jraw.paginators.Sorting;
 import net.dean.jraw.paginators.SubredditPaginator;
 import net.dean.jraw.paginators.TimePeriod;
@@ -136,14 +141,27 @@ public class MainActivity extends AppCompatActivity
     }
 
     public void postClick(View view) {
-        TextView vuev = (TextView) view.findViewById(R.id.post_title);
-        Log.d(TAG, vuev.getText().toString());
-        Gson gS = new Gson();
-        Submission submission = redditService.getCurrentSubmissions().get(0);
-        String target = gS.toJson(submission);
-        Log.d(TAG, target);
+        String submissionId = null;
+        TextView textView = (TextView) view.findViewById(R.id.post_id);
+        submissionId = textView.getText().toString();
+
+
+        Submission submission = redditService.getSubmissionById(submissionId);
+        JsonNode jsonNode = submission.getDataNode();
+        ObjectMapper mapper = new ObjectMapper();
+        String submissionAsString = null;
+        try {
+            submissionAsString = mapper.writeValueAsString(jsonNode);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+//        String text = jsonNode.toString();
+//        JsonNode backAgain = JsonNodeFactory.instance.textNode(text);
+//        Submission submission2 = new Submission(backAgain);
+//        Log.d(TAG, backAgain.toString());
+
         Intent intent = new Intent(this, ThreadActivity.class);
-        intent.putExtra("theSubmission", target);
+        intent.putExtra("theSubmission", submissionAsString);
         Log.d(TAG, "Starting ThreadActivity...");
         startActivity(intent);
     }

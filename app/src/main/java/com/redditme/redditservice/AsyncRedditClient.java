@@ -92,4 +92,12 @@ public class AsyncRedditClient extends RedditClient implements RedditService {
     public List<Submission> getCurrentSubmissions() {
         return currentSubmissions;
     }
+
+    @Override
+    public Submission getSubmissionById(String id) {
+        for (Submission sub : currentSubmissions) {
+            if(sub.getId().equalsIgnoreCase(id)) return sub;
+        }
+        return null;
+    }
 }

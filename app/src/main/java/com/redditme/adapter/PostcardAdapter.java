@@ -77,6 +77,7 @@ public class PostcardAdapter extends RecyclerView.Adapter<PostcardAdapter.Submis
         }
         postCardViewHolder.postThumbnail.setImageDrawable(thumbnail);
         postCardViewHolder.postCommentsCount.setText(submissionList.get(position).getCommentCount().toString());
+        postCardViewHolder.postId.setText(submissionList.get(position).getId());
     }
 
     @Override
@@ -86,6 +87,7 @@ public class PostcardAdapter extends RecyclerView.Adapter<PostcardAdapter.Submis
 
     public static class SubmissionViewHolder extends RecyclerView.ViewHolder {
         CardView cv;
+        TextView postId;
         TextView postTitle;
         TextView postDescription;
         ImageView postThumbnail;
@@ -94,6 +96,7 @@ public class PostcardAdapter extends RecyclerView.Adapter<PostcardAdapter.Submis
         SubmissionViewHolder(View itemView) {
             super(itemView);
             cv = (CardView)itemView.findViewById(R.id.cv);
+            postId = (TextView)itemView.findViewById(R.id.post_id);
             postTitle = (TextView)itemView.findViewById(R.id.post_title);
             postDescription = (TextView)itemView.findViewById(R.id.post_description);
             postThumbnail = (ImageView)itemView.findViewById(R.id.post_thumbnail);

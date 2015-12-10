@@ -3,22 +3,32 @@ package com.redditme;
 import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.google.gson.Gson;
 import com.redditme.activity.FragmentSidemenu;
 import com.redditme.adapter.PostcardAdapter;
 import com.redditme.fontawesome.DrawableAwesome;
 import com.redditme.model.PostCard;
+import com.redditme.redditservice.AsyncRedditClient;
+import com.redditme.redditservice.RedditService;
 
 import net.dean.jraw.models.Submission;
+import net.dean.jraw.models.meta.SubmissionSerializer;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,15 +47,27 @@ public class ThreadActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_thread);
+        ObjectMapper mapper = new ObjectMapper();
 
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
-        String gsonSubmission = getIntent().getStringExtra("theSubmission");
-        Gson gS = new Gson();
-        this.submission = gS.fromJson(gsonSubmission, Submission.class);
+        String imback = getIntent().getStringExtra("theSubmission");
+        JsonNode backAgain = null;
+        try {
+            backAgain = mapper.readTree(imback);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        submission = new Submission(backAgain);
+
         setSupportActionBar(mToolbar);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
+        RelativeLayout rL = (RelativeLayout) findViewById(R.id.cv_relative_layout);
+        rL.setOnClickListener(null);
+        TextView pc_title = (TextView) findViewById(R.id.post_title);
+        pc_title.setText(submission.getTitle());
 //        content = (RecyclerView)findViewById(R.id.rv_postcards);
 //        content.setHasFixedSize(true);
 //        adapter = new PostcardAdapter(postCardList);
