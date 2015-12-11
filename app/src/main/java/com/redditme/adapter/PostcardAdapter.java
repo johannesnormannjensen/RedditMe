@@ -1,10 +1,7 @@
 package com.redditme.adapter;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
-import android.graphics.drawable.VectorDrawable;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -13,18 +10,12 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.redditme.MainActivity;
 import com.redditme.R;
-import com.redditme.ThumbnailGenerator;
-import com.redditme.model.PostCard;
+import com.redditme.utils.ThumbnailGenerator;
 
 import net.dean.jraw.models.Submission;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -60,21 +51,17 @@ public class PostcardAdapter extends RecyclerView.Adapter<PostcardAdapter.Submis
         postCardViewHolder.postDescription.setText(submissionList.get(position).getSelftext());
         String sThumbnailURL = submissionList.get(position).getThumbnail();
         Drawable thumbnail;
-        if(sThumbnailURL == null) {
-            thumbnail = context.getResources().getDrawable(R.drawable.reddit_standard);
-        } else {
-            ThumbnailGenerator tng = new ThumbnailGenerator();
-            try {
-                tng.execute(sThumbnailURL).get(10, TimeUnit.SECONDS);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            } catch (ExecutionException e) {
-                e.printStackTrace();
-            } catch (TimeoutException e) {
-                e.printStackTrace();
-            }
-            thumbnail = tng.gimmeTheThumbnail();
+        ThumbnailGenerator tng = new ThumbnailGenerator();
+        try {
+            tng.execute(sThumbnailURL).get(10, TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        } catch (TimeoutException e) {
+            e.printStackTrace();
         }
+        thumbnail = tng.gimmeTheThumbnail();
         postCardViewHolder.postThumbnail.setImageDrawable(thumbnail);
         postCardViewHolder.postCommentsCount.setText(submissionList.get(position).getCommentCount().toString());
         postCardViewHolder.postId.setText(submissionList.get(position).getId());

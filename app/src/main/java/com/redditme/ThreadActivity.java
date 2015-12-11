@@ -1,36 +1,23 @@
 package com.redditme;
 
 import android.os.Bundle;
-import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.CardView;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.google.gson.Gson;
-import com.redditme.activity.FragmentSidemenu;
 import com.redditme.adapter.PostcardAdapter;
-import com.redditme.fontawesome.DrawableAwesome;
-import com.redditme.model.PostCard;
-import com.redditme.redditservice.AsyncRedditClient;
-import com.redditme.redditservice.RedditService;
+import com.redditme.model.SelectedSubmission;
+import com.redditme.model.SelectedSubmissionGenerator;
+import com.redditme.utils.JsonNodeUtil;
 
 import net.dean.jraw.models.Submission;
-import net.dean.jraw.models.meta.SubmissionSerializer;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by Johannes on 08-12-2015.
@@ -48,32 +35,19 @@ public class ThreadActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_thread);
-        ObjectMapper mapper = new ObjectMapper();
+
 
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
-        String imback = getIntent().getStringExtra("theSubmission");
-        JsonNode backAgain = null;
-        try {
-            backAgain = mapper.readTree(imback);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        String submissionString = getIntent().getStringExtra("theSubmission");
+        submission = new Submission(JsonNodeUtil.stringToJsonNode(submissionString));
 
-        submission = new Submission(backAgain);
-
+//        Log.d(TAG, submission.getComments().get(0).getComment().getBody());
         setSupportActionBar(mToolbar);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
-        RelativeLayout rL = (RelativeLayout) findViewById(R.id.cv_relative_layout);
+        RelativeLayout rL = (RelativeLayout) findViewById(R.id.selected_submission_relative_layout);
         rL.setOnClickListener(null);
-        TextView pc_title = (TextView) findViewById(R.id.post_title);
-        pc_title.setText(submission.getTitle());
-//        content = (RecyclerView)findViewById(R.id.rv_postcards);
-//        content.setHasFixedSize(true);
-//        adapter = new PostcardAdapter(postCardList);
-//        content.setAdapter(adapter);
-//        LinearLayoutManager llm = new LinearLayoutManager(getApplicationContext());
-//        content.setLayoutManager(llm);
+        SelectedSubmission selectedSubmission = new SelectedSubmissionGenerator(rL, submission).build();
     }
 
     @Override
@@ -102,9 +76,5 @@ public class ThreadActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    private void setSubmission(Submission submission) {
-        this.submission= submission;
     }
 }
