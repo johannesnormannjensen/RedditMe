@@ -22,10 +22,13 @@ import java.util.concurrent.TimeoutException;
  */
 public class AsyncRedditClient extends RedditClient implements RedditService {
     private List<Submission> currentSubmissions;
+    private Submission selectedSubmission;
+    private static final AsyncRedditClient redditClient = new AsyncRedditClient();
 
     public AsyncRedditClient() {
         super(REDDITME_USERAGENT);
         this.setLoggingMode(LoggingMode.ALWAYS);
+        authenticateUserless();
     }
 
     public AsyncRedditClient(UserAgent userAgent, HttpAdapter<?> adapter) {
@@ -79,8 +82,14 @@ public class AsyncRedditClient extends RedditClient implements RedditService {
         }
     }
 
-    @Override
-    public RedditClient getRedditClient() {
+    // getters / setters
+
+    public static AsyncRedditClient getInstance() {
+        return redditClient;
+    }
+    // private, the method is only for convinience
+    // anything that needs to interact with the reddit client should do it through methods listed in the interface
+    private RedditClient getRedditClient() {
         return (RedditClient) this;
     }
 
@@ -94,10 +103,26 @@ public class AsyncRedditClient extends RedditClient implements RedditService {
     }
 
     @Override
-    public Submission getSubmissionById(String id) {
-        for (Submission sub : currentSubmissions) {
-            if(sub.getId().equalsIgnoreCase(id)) return sub;
+    public Submission getSelectedSubmission() {
+        return selectedSubmission;
+    }
+
+    @Override
+    public void loadSubmissionById(final String id) {
+        try {
+            new AsyncTask<RedditService, Void, Submission>() {
+                @Override
+                protected Submission doInBackground(RedditService... params) {
+                    selectedSubmission = getSubmission(id);
+                    return selectedSubmission;
+                }
+            }.execute(this).get(10000, TimeUnit.MILLISECONDS); // if the asynctask doesn't complete within 10000 ms the main thread continues.
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        } catch (TimeoutException e) {
+            e.printStackTrace();
         }
-        return null;
     }
 }

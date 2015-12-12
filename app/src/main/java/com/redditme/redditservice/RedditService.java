@@ -1,6 +1,5 @@
 package com.redditme.redditservice;
 
-import net.dean.jraw.RedditClient;
 import net.dean.jraw.http.NetworkException;
 import net.dean.jraw.http.UserAgent;
 import net.dean.jraw.http.oauth.Credentials;
@@ -11,6 +10,7 @@ import java.util.UUID;
 
 /**
  * Created by Ferenc on 12/8/2015.
+ * This interface allows us to run the entire system with a mockup reddit client (for example one that needs no internet).
  */
 public interface RedditService {
     public static final String VERSION_NAME = "0.1";
@@ -20,13 +20,14 @@ public interface RedditService {
 
     public void authenticateUserless() throws NetworkException;
 
+    // loader methods: here go the methods that actually access remote resources (in our case: the reddit API server). The reason for separating them is synchronizaiton.
     public void loadSubmissions();
 
-    public RedditClient getRedditClient();
+    public void loadSubmissionById(String id);
 
-    public void setCurrentSubmissions(List<Submission> submissions);
+    // getter methods: methods that make the loaded resources accessible. The reason for separating them is synchronizaiton
 
     public List<Submission> getCurrentSubmissions();
 
-    public Submission getSubmissionById(String id);
+    public Submission getSelectedSubmission();
 }

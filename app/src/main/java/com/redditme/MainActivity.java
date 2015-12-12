@@ -23,9 +23,6 @@ import com.redditme.activity.ItemFragment;
 import com.redditme.adapter.PostcardAdapter;
 import com.redditme.redditservice.AsyncRedditClient;
 import com.redditme.redditservice.RedditService;
-import com.redditme.utils.JsonNodeUtil;
-
-import net.dean.jraw.models.Submission;
 
 
 public class MainActivity extends AppCompatActivity
@@ -34,7 +31,7 @@ public class MainActivity extends AppCompatActivity
     private static final String TAG = MainActivity.class.getSimpleName();
 
     private static Context mainContext = null;
-    final RedditService redditService = new AsyncRedditClient();
+    final RedditService redditService = AsyncRedditClient.getInstance();
 
     private Toolbar mToolbar;
     private FragmentSidemenu sidemenuFragment;
@@ -57,7 +54,6 @@ public class MainActivity extends AppCompatActivity
                 (DrawerLayout) findViewById(R.id.drawer_layout), mToolbar);
         sidemenuFragment.setDrawerListener(this);
 
-        redditService.authenticateUserless();
         redditService.loadSubmissions();
 
         content = (RecyclerView) findViewById(R.id.rv_postcards);
@@ -128,11 +124,8 @@ public class MainActivity extends AppCompatActivity
         String submissionId = null;
         TextView textView = (TextView) view.findViewById(R.id.post_id);
         submissionId = textView.getText().toString();
-        Submission submission = redditService.getSubmissionById(submissionId);
-        String subAsString = JsonNodeUtil.jsonNodeToString(submission.getDataNode());
-
         Intent intent = new Intent(this, ThreadActivity.class);
-        intent.putExtra("theSubmission", subAsString);
+        intent.putExtra("subId", submissionId);
         Log.d(TAG, "Starting ThreadActivity...");
         startActivity(intent);
     }

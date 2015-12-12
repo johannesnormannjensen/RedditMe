@@ -6,16 +6,14 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.ImageView;
 import android.widget.RelativeLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.redditme.adapter.PostcardAdapter;
 import com.redditme.model.SelectedSubmission;
 import com.redditme.model.SelectedSubmissionGenerator;
-import com.redditme.utils.JsonNodeUtil;
+import com.redditme.redditservice.AsyncRedditClient;
+import com.redditme.redditservice.RedditService;
 
 import net.dean.jraw.models.Submission;
 
@@ -27,19 +25,17 @@ public class ThreadActivity extends AppCompatActivity {
     private static final String TAG = MainActivity.class.getSimpleName();
 
     private Toolbar mToolbar;
-    private Submission submission;
     private RecyclerView content;
     private PostcardAdapter adapter;
+    final RedditService redditClient = AsyncRedditClient.getInstance();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_thread);
-
-
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
-        String submissionString = getIntent().getStringExtra("theSubmission");
-        submission = new Submission(JsonNodeUtil.stringToJsonNode(submissionString));
+        String subId= getIntent().getStringExtra("subId");
+        redditClient.loadSubmissionById(subId);
 
 //        Log.d(TAG, submission.getComments().get(0).getComment().getBody());
         setSupportActionBar(mToolbar);
@@ -47,6 +43,7 @@ public class ThreadActivity extends AppCompatActivity {
 
         RelativeLayout rL = (RelativeLayout) findViewById(R.id.selected_submission_relative_layout);
         rL.setOnClickListener(null);
+        Submission submission = redditClient.getSelectedSubmission();
         SelectedSubmission selectedSubmission = new SelectedSubmissionGenerator(rL, submission).build();
     }
 
