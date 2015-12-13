@@ -20,8 +20,8 @@ public class ThumbnailGenerator extends AsyncTask <String, Void, String> {
     private Drawable thumbnail = null;
     private Context context;
 
-    public ThumbnailGenerator () {
-        context = MainActivity.getMainContext();
+    public ThumbnailGenerator (Context context) {
+        this.context = context;
     }
 
     @Override

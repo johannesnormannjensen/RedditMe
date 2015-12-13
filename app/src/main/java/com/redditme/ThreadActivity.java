@@ -1,21 +1,30 @@
 package com.redditme;
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.redditme.adapter.PostcardAdapter;
 import com.redditme.model.SelectedSubmission;
-import com.redditme.model.SelectedSubmissionGenerator;
 import com.redditme.redditservice.AsyncRedditClient;
 import com.redditme.redditservice.RedditService;
+import com.redditme.utils.ThumbnailGenerator;
 
 import net.dean.jraw.models.Submission;
+
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 /**
  * Created by Johannes on 08-12-2015.
@@ -24,6 +33,11 @@ public class ThreadActivity extends AppCompatActivity {
 
     private static final String TAG = MainActivity.class.getSimpleName();
 
+    private Activity threadActivity;
+
+    private ThumbnailGenerator thumbnailGenerator;
+
+    private Submission submission;
     private Toolbar mToolbar;
     private RecyclerView content;
     private PostcardAdapter adapter;
@@ -34,17 +48,19 @@ public class ThreadActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_thread);
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
-        String subId= getIntent().getStringExtra("subId");
+        String subId = getIntent().getStringExtra("subId");
         redditClient.loadSubmissionById(subId);
 
 //        Log.d(TAG, submission.getComments().get(0).getComment().getBody());
         setSupportActionBar(mToolbar);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
+        this.threadActivity = (Activity) this;
+        this.thumbnailGenerator = new ThumbnailGenerator(this);
         RelativeLayout rL = (RelativeLayout) findViewById(R.id.selected_submission_relative_layout);
-        rL.setOnClickListener(null);
-        Submission submission = redditClient.getSelectedSubmission();
-        SelectedSubmission selectedSubmission = new SelectedSubmissionGenerator(rL, submission).build();
+        submission = redditClient.getSelectedSubmission();
+        SelectedSubmission selectedSubmission = new SelectedSubmission(rL, submission, getApplicationContext());
+
     }
 
     @Override

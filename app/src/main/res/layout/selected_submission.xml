@@ -12,26 +12,25 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="300dp"
+        android:layout_height="wrap_content"
         android:id="@+id/selected_submission_relative_layout"
         android:padding="8dp"
-        android:onClick="postClick"
         >
 
         <ImageView
-            android:layout_width="108dp"
-            android:layout_height="108dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:id="@+id/selected_submission_thumbnail"
             android:layout_marginEnd="16dp"
             android:layout_alignParentTop="true"
-            android:layout_alignParentStart="true" />
+            android:layout_centerHorizontal="true"
+            android:adjustViewBounds="true"/>
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/selected_submission_title"
-            android:layout_toEndOf="@+id/post_thumbnail"
-            android:layout_alignParentTop="true"
+            android:layout_below="@+id/selected_submission_thumbnail"
             android:textSize="24sp"
             />
 
@@ -39,8 +38,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/selected_submission_description"
-            android:layout_toEndOf="@+id/post_thumbnail"
-            android:layout_below="@+id/post_title"
+            android:layout_below="@+id/selected_submission_title"
             android:textSize="12sp"
             />
 
@@ -48,8 +46,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/selected_submission_commentsCount"
-            android:layout_toEndOf="@+id/post_thumbnail"
-            android:layout_below="@+id/post_description"
+            android:layout_alignParentStart="true"
+            android:layout_below="@+id/selected_submission_description"
             android:textSize="12sp"
             />
         <TextView

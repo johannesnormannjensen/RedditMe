@@ -58,7 +58,7 @@ public class MainActivity extends AppCompatActivity
 
         content = (RecyclerView) findViewById(R.id.rv_postcards);
         content.setHasFixedSize(true);
-        adapter = new PostcardAdapter(redditService.getCurrentSubmissions());
+        adapter = new PostcardAdapter(redditService.getCurrentSubmissions(), getMainContext());
         content.setAdapter(adapter);
         LinearLayoutManager llm = new LinearLayoutManager(mainContext);
         content.setLayoutManager(llm);

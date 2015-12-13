@@ -27,9 +27,11 @@ import java.util.concurrent.TimeoutException;
 public class PostcardAdapter extends RecyclerView.Adapter<PostcardAdapter.SubmissionViewHolder> {
 
     private List<Submission> submissionList;
+    private Context context;
 
-    public PostcardAdapter(List<Submission> submissionList) {
+    public PostcardAdapter(List<Submission> submissionList, Context context) {
         this.submissionList = submissionList;
+        this.context = context;
     }
 
     @Override
@@ -46,12 +48,11 @@ public class PostcardAdapter extends RecyclerView.Adapter<PostcardAdapter.Submis
 
     @Override
     public void onBindViewHolder(SubmissionViewHolder postCardViewHolder, int position) {
-        Context context = MainActivity.getMainContext();
         postCardViewHolder.postTitle.setText(submissionList.get(position).getTitle());
         postCardViewHolder.postDescription.setText(submissionList.get(position).getSelftext());
         String sThumbnailURL = submissionList.get(position).getThumbnail();
         Drawable thumbnail;
-        ThumbnailGenerator tng = new ThumbnailGenerator();
+        ThumbnailGenerator tng = new ThumbnailGenerator(context);
         try {
             tng.execute(sThumbnailURL).get(10, TimeUnit.SECONDS);
         } catch (InterruptedException e) {
