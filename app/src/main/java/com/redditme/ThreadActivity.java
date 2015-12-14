@@ -1,10 +1,13 @@
 package com.redditme;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -14,6 +17,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.redditme.adapter.CommentAdapter;
 import com.redditme.adapter.PostcardAdapter;
 import com.redditme.model.SelectedSubmission;
 import com.redditme.redditservice.AsyncRedditClient;
@@ -40,7 +44,7 @@ public class ThreadActivity extends AppCompatActivity {
     private Submission submission;
     private Toolbar mToolbar;
     private RecyclerView content;
-    private PostcardAdapter adapter;
+    private CommentAdapter adapter;
     final RedditService redditClient = AsyncRedditClient.getInstance();
 
     @Override
@@ -61,8 +65,23 @@ public class ThreadActivity extends AppCompatActivity {
         submission = redditClient.getSelectedSubmission();
         SelectedSubmission selectedSubmission = new SelectedSubmission(rL, submission, getApplicationContext());
 
-    }
+        content = (RecyclerView) findViewById(R.id.rv_comments);
+        content.setHasFixedSize(true);
+        adapter = new CommentAdapter(submission.getComments(), getApplicationContext());
+        content.setAdapter(adapter);
+        LinearLayoutManager llm = new LinearLayoutManager(getApplicationContext());
+        content.setLayoutManager(llm);
 
+    }
+    @Override
+    public void startActivity(Intent intent) {
+        if (TextUtils.equals(intent.getAction(), Intent.ACTION_VIEW)) {
+            System.out.println("clicked");
+        }
+        else {
+            System.out.println("not clicked");
+        }
+    }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.

@@ -33,7 +33,7 @@ public class SelectedSubmission {
         this.postDescription = (TextView)view.findViewById(R.id.selected_submission_description);
         this.postThumbnail = (ImageView)view.findViewById(R.id.selected_submission_thumbnail);
         this.postCommentsCount = (TextView)view.findViewById(R.id.selected_submission_commentsCount);
-        this.deviceDensity = context.getResources().getDisplayMetrics().density * 2;
+        this.deviceDensity = context.getResources().getDisplayMetrics().density;
 
 
         assignValues(submission, new ThumbnailGenerator(context));
@@ -56,7 +56,7 @@ public class SelectedSubmission {
         }
         ;
         this.postThumbnail.setImageDrawable(thumbnailGenerator.gimmeTheThumbnail());
-        this.postCommentsCount.setText(submission.getCommentCount().toString());
+        this.postCommentsCount.setText("Comments: " + submission.getCommentCount().toString());
     }
 
     private void assignLayoutParams(View view) {

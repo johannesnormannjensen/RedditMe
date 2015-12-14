@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.redditme.MainActivity;
@@ -50,8 +51,15 @@ public class PostcardAdapter extends RecyclerView.Adapter<PostcardAdapter.Submis
     public void onBindViewHolder(SubmissionViewHolder postCardViewHolder, int position) {
         postCardViewHolder.postTitle.setText(submissionList.get(position).getTitle());
         postCardViewHolder.postDescription.setText(submissionList.get(position).getSelftext());
-        String sThumbnailURL = submissionList.get(position).getThumbnail();
+        attachThumbnail(postCardViewHolder, position);
+        postCardViewHolder.postCommentsCount.setText("Comments: " + submissionList.get(position).getCommentCount().toString());
+        postCardViewHolder.postId.setText(submissionList.get(position).getId());
+    }
+
+    private void attachThumbnail(SubmissionViewHolder postCardViewHolder, int position) {
         Drawable thumbnail;
+
+        String sThumbnailURL = submissionList.get(position).getThumbnail();
         ThumbnailGenerator tng = new ThumbnailGenerator(context);
         try {
             tng.execute(sThumbnailURL).get(10, TimeUnit.SECONDS);
@@ -64,8 +72,13 @@ public class PostcardAdapter extends RecyclerView.Adapter<PostcardAdapter.Submis
         }
         thumbnail = tng.gimmeTheThumbnail();
         postCardViewHolder.postThumbnail.setImageDrawable(thumbnail);
-        postCardViewHolder.postCommentsCount.setText(submissionList.get(position).getCommentCount().toString());
-        postCardViewHolder.postId.setText(submissionList.get(position).getId());
+
+//        int thumbnailWidth = (int) (postCardViewHolder.postThumbnail.getDrawable().getIntrinsicWidth() * context.getResources().getDisplayMetrics().density);
+//        int thumbnailHeight = (int) (postCardViewHolder.postThumbnail.getDrawable().getIntrinsicHeight() * context.getResources().getDisplayMetrics().density);
+//        RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(thumbnailWidth, thumbnailHeight);
+//        layoutParams.addRule(RelativeLayout.CENTER_HORIZONTAL);
+//
+//        postCardViewHolder.postThumbnail.setLayoutParams(layoutParams);
     }
 
     @Override
